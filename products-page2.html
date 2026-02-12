@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Products | FiveM Store</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ========= كل التنسيقات الأصلية ========= */
+.store-title{
+  position:relative;
+  display:inline-block;
+  padding:14px 34px;
+  font-size:48px;
+  font-weight:900;
+  background:linear-gradient(90deg,#1e40af,#7c3aed);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  border-radius:14px;
+}
+.store-title::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:14px;
+  border:2px solid #7c3aed;
+  box-shadow:
+    0 0 6px #7c3aed,
+    0 0 14px #3b82f6,
+    0 0 28px rgba(124,58,237,.8);
+  animation:electric 1.6s infinite;
+  pointer-events:none;
+}
+@keyframes electric{
+  0%{opacity:.15;box-shadow:0 0 4px #3b82f6;}
+  20%{opacity:1;box-shadow:0 0 8px #7c3aed,0 0 18px #3b82f6;}
+  40%{opacity:.3;}
+  60%{opacity:1;box-shadow:0 0 12px #7c3aed,0 0 30px rgba(59,130,246,.9);}
+  100%{opacity:.2;box-shadow:0 0 6px #3b82f6;}
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:Arial, Helvetica, sans-serif;
+  color:#fff;
+  background:
+    linear-gradient(rgba(2,6,23,.9),rgba(2,6,23,.95)),
+    url("https://drop-assets.ea.com/images/3tGdbsLcRXbmbXL5sPvJOt/ce47f4ca25baa40ab2cbe225be51ae7d/FC26_Rev_VVD_FUT_16x9.jpg?im=AspectCrop=(16,9),xPosition=0.4,yPosition=0.3472222222222222");
+  background-size:cover;
+  background-position:center;
+  background-attachment:fixed;
+}
+.header{text-align:center;padding:50px 20px;position:relative;}
+.header h1{font-size:48px;font-weight:900;background:linear-gradient(90deg,#003d9e,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.header p{color:#94a3b8;margin-top:10px;}
+.products{padding:40px 60px;display:grid;grid-template-columns:repeat(4, 1fr);gap:22px;}
+@media(max-width:1100px){.products{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){.products{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.products{grid-template-columns:1fr}}
+.card{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:16px;
+  padding:14px;
+  cursor:pointer;
+  transition:.3s;
+  text-align:center;
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 0 30px rgba(124,58,237,.4);
+}
+.card img{
+  width:100%;
+  height:180px;          /* قللنا شوي عن 200px */
+  object-fit:contain;    /* تظهر الصورة كاملة */
+  border-radius:12px;
+  margin-bottom:10px;
+  background:#020617;    /* خلفية الفراغ حول الصورة */
+  padding:5px;           /* قلل الفراغ الداخلي قليلًا */
+}
+.card h3{
+  font-size:16px;
+  margin-bottom:6px
+}
+.price{
+  color:#3b82f6;
+  font-weight:bold
+}
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+.modal-box{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:20px;
+  padding:25px;
+  width:90%;
+  max-width:520px;
+  text-align:center;
+  position:relative;
+}
+.modal-box img{
+  width:100%;          /* بدل 100% عشان تصغر الصورة */
+  max-height:430px;   /* أقصى ارتفاع للصورة */
+  object-fit:cover;   /* يحافظ على النسب */
+  border-radius:14px;
+  margin-bottom:10px; /* تخلي المسافة أقل بين الصورة والنص */
+}
+
+.modal-box p{
+  color:#94a3b8;
+  margin:8px 0;       /* تخلي المسافة بين الفقرات أقل */
+  max-height:150px;   /* يمنع النص الطويل من زيادة ارتفاع المودال */
+  overflow-y:auto;    /* لو النص طويل يضيف شريط تمرير */
+  text-align:center;  /* يجعل النص مرتب */
+}
+.close{position:absolute;top:15px;right:20px;cursor:pointer}
+.pagination{
+  display:flex;
+  justify-content:center; /* يوسّط الأزرار أفقياً */
+  align-items:center;     /* يوسّط العناصر رأسياً إذا في حاجة */
+  gap:10px;               /* مسافة بين الأزرار */
+  padding:20px 0;         /* مسافة فوق وتحت فقط */
+  margin:0 auto;          /* يوسّط pagination نفسه داخل الصفحة */
+}
+
+.pagination a {
+  display: inline-flex;      /* خليها flex عشان text-align ما يأثر */
+  justify-content: center;
+  align-items: center;
+  padding: 10px 18px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  color: #c7d2fe;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.pagination a:hover {
+  background: linear-gradient(90deg,#7c3aed,#2563eb);
+  color: white;
+}
+.stars{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.star{position:absolute;top:-10px;width:2px;height:2px;background:white;opacity:.8;animation:fall linear infinite;}
+@keyframes fall{to{transform:translateY(110vh);}}
+.header, .products, .pagination {position:relative;z-index:1;}
+#quantity{font-size:18px;font-weight:bold;margin:0 10px;}
+#invoiceSection input{width:100%;padding:10px;margin-bottom:8px;border-radius:8px;border:none;background:#1e293b;color:white;text-align:center;}
+#invoiceSection button{padding:10px 18px;border-radius:8px;border:none;font-weight:bold;cursor:pointer;}
+.lang-btn{
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:linear-gradient(90deg,#7c3aed,#2563eb);
+  color:white;
+  padding:8px 14px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+  z-index:2;
+}
+/* ====== FIX أزرار + - ====== */
+.qty-btn{
+  background: linear-gradient(135deg,#7c3aed,#2563eb) !important;
+  color: #fff !important;
+  font-size: 26px !important;
+  font-weight: 900;
+  width: 55px;
+  height: 55px;
+  border-radius: 14px;
+  border: none !important;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(124,58,237,.6);
+  transition: .2s ease;
+}
+
+.qty-btn:hover{
+  transform: scale(1.08);
+  box-shadow: 0 0 28px rgba(124,58,237,.9);
+}
+/* ====== زر Checkout القوي ====== */
+#checkoutBtn{
+  width:100%;
+  margin-top:15px;
+  padding:16px 0;
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:1px;
+  text-transform:uppercase;
+
+  background: linear-gradient(135deg,#00158b,#4a008f);
+  color:#fff;
+
+  border:none;
+  border-radius:16px;
+  cursor:pointer;
+
+  box-shadow:
+    0 0 15px rgba(87, 0, 128, 0.527),
+    0 0 35px rgba(0, 3, 182, 0.4);
+
+  transition: .25s ease;
+}
+
+/* Hover */
+#checkoutBtn:hover{
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 0 25px rgba(87, 0, 128, 0.527),
+    0 0 55px rgba(0, 3, 182, 0.4);
+}
+
+/* Click */
+#checkoutBtn:active{
+  transform: scale(.97);
+}
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+
+<!-- زر الترجمة -->
+<button class="lang-btn" onclick="toggleLang()">🌐 AR / EN</button>
+
+<div class="header">
+  <h1 class="store-title">FiveM Store</h1>
+  <p data-en="The best international products that everyone is looking for are available in FiveM Store" data-ar="FiveM Store افضل المنتجات العالمية التي يبحث عنها الجميع موجودة في">The best international products that everyone is looking for are available in FiveM Store</p>
+</div>
+
+<div class="products">
+
+  <div class="card" 
+    data-en-title="Black Ops 7 Account" data-ar-title="حساب بلاك اوبس"
+    data-en-desc="🎮 Black Ops 7 Accounts – Full Access
+Premium, fully verified accounts for Call of Duty: Black Ops 7, available instantly with full login details.
+All accounts are clean, secure, and ready to play.
+✨ Some accounts may also include rare and exclusive cosmetics — it's a 50/50 chance to get something special!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧰 What’s Included
+🔐 Full Access — email & password changeable
+🧼 Clean Stats — no bans or restrictions
+✅ 100% playable and secure
+✨ Some accounts contain rare cosmetics and exclusive items
+🕒 24-hour replacement warranty
+⚡ Instant automatic delivery after purchase" data-ar-desc="🎮 حسابات بلاك أوبس 7 – وصول كامل
+حسابات بريميوم، مُتحقَّق منها بالكامل للعبة Call of Duty: Black Ops 7، متاحة على الفور مع جميع تفاصيل الدخول.
+جميع الحسابات نظيفة وآمنة وجاهزة للعب.
+✨ بعض الحسابات قد تتضمن مستحضرات تجميل نادرة وحصرية — فرصة الحصول على شيء مميز تصل إلى 50/50!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧰 ما هو متضمن
+🔐 وصول كامل — يمكن تغيير البريد الإلكتروني وكلمة المرور
+🧼 إحصائيات نظيفة — بدون حظر أو قيود
+✅ قابل للعب وآمن 100٪
+✨ بعض الحسابات تحتوي على مستحضرات تجميل نادرة وعناصر حصرية
+🕒 ضمان استبدال لمدة 24 ساعة
+⚡ تسليم فوري تلقائي بعد الشراء"
+    data-price="$25.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_03-42-52-714.png?fit=fill&auto=format">
+    <h3 data-en="Black Ops 7 Account" data-ar="حساب بلاك اوبس">Black Ops 7 Account</h3>
+    <div class="price" data-en="$25.00" data-ar="$25.00">$25.00</div>
+  </div>
+
+<div class="card" 
+    data-en-title="Discord 2020 Account" data-ar-title="حساب ديسكورد 2022"
+    data-en-desc="💬 FA Discord Accounts – Full Access & Verified
+Secure, private, and fully verified Discord accounts ready for real use or automation.
+Perfect for personal use, bots, Nitro boosting, or business setups.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧾Account Types
+📧 E-Mail Verified – Basic verified (2025)
+📱 E-Mail + Phone Verified – Double verified (2025)
+🕒 3+ Months Aged – Verified & aged for extra trust
+📅 Year-Based Accounts – 2023, 2020, 2019, 2017, 2016
+💎 Nitro 1 Month + 2 Boosts – Phone verified
+🚀 Nitro 3 Months + 2 Boosts – Phone verified
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧰What’s Included
+🔐 Full access & changeable credentials
+📧 Email and/or phone verification depending on variant
+🧼Private, unused & 100% safe
+⚡Instant delivery right after purchase
+🕒 24-hour replacement warranty" data-ar-desc="💬 حسابات ديسكورد FA - وصول كامل وموثقة
+حسابات ديسكورد آمنة وخاصة وموثقة بالكامل، جاهزة للاستخدام الفعلي أو التشغيل الآلي.
+
+مثالية للاستخدام الشخصي، أو لإنشاء برامج روبوت، أو لزيادة نقاط نيترو، أو لإعدادات الأعمال.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧾 أنواع الحسابات
+📧 تم التحقق من البريد الإلكتروني - تحقق أساسي (2025)
+📱 تم التحقق من البريد الإلكتروني ورقم الهاتف - تحقق مزدوج (2025)
+🕒 مضى على الحساب 3 أشهر أو أكثر - تم التحقق منه وتمت ترقيته لزيادة الثقة
+📅 حسابات سنوية - 2023، 2020، 2019، 2017، 2016
+💎 نيترو شهر واحد + باقتان إضافيتان - تم التحقق من رقم الهاتف
+🚀 نيترو 3 أشهر + باقتان إضافيتان - تم التحقق من رقم الهاتف تم التحقق
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧰 المحتويات
+🔐 وصول كامل وبيانات اعتماد قابلة للتغيير
+📧 التحقق عبر البريد الإلكتروني و/أو رقم الهاتف حسب الإصدار
+🧼 خاص، غير مستخدم وآمن تمامًا
+⚡ توصيل فوري بعد الشراء
+🕒 ضمان استبدال خلال 24 ساعة"
+    data-price="$3.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_03-45-48-427.png?fit=fill&auto=format">
+    <h3 data-en="Discord 2020 Account" data-ar="حساب ديسكورد 2022">Discord 2020 Account</h3>
+    <div class="price" data-en="$3.00" data-ar="$3.00">$3.00</div>
+  </div>
+
+  <div class="card" 
+    data-en-title="FC 26 Account" data-ar-title="حساب FC 26 Account"
+    data-en-desc="⚽ حساب EA FC 26 - وصول كامل
+حسابات مميزة وموثقة بالكامل للعبة EA FC 26، متاحة فورًا مع بيانات تسجيل الدخول الكاملة.
+
+جميع الحسابات نظيفة وآمنة وجاهزة للعب.
+
+✨ قد تحتوي بعض الحسابات على عناصر FUT نادرة أو فرق ذات تصنيف عالٍ، ولكن هذا ليس مضمونًا.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧰 المحتويات
+🔐 وصول كامل - إمكانية تغيير البريد الإلكتروني وكلمة المرور
+🧼 حساب نظيف بدون حظر أو قيود
+✅ بيانات تسجيل دخول فورية بعد الشراء
+✨ تحتوي بعض الحسابات على لاعبين FUT نادرين أو عناصر قيّمة
+🕒 ضمان استبدال خلال 24 ساعة
+⚡ تسليم تلقائي فوري بعد الشراء" data-ar-desc="🤖 ChatGPT Plus — وصول مدى الحياة (على بريدك الإلكتروني)
+· افتح القوة الكاملة للذكاء الاصطناعي — الآن أصبح الأمر أسهل وأكثر أمانًا وذكاءً من أي وقت مضى. لا مزيد من مشاركة الحسابات — نحن نضيف ChatGPT Plus مباشرة إلى بريدك الإلكتروني الخاص لتحقيق أقصى درجات الأمان والتحكم.
+
+🔐 كيف يعمل:
+· 📩 بعد الشراء، قم ببساطة بإنشاء تذكرة على Discord الخاص بنا وأرسل لنا البريد الإلكتروني الذي تريد استخدامه.
+· 🧠 سنضيف ChatGPT Plus (GPT-5) إلى هذا البريد الإلكتروني — عادةً خلال دقائق.
+
+✅ ما هو مشمول:
+· 🚀 ChatGPT Plus (GPT-5) — وصول مدى الحياة
+· 🔄 يعمل على بريدك الإلكتروني الخاص (أكثر أمانًا وخصوصية)
+· ⏱️ وصول ذو أولوية حتى أثناء الطلب العالي
+· ⚡ استجابات أسرع وأداء محسّن
+· 🌐 يعمل عالميًا على الويب والهاتف المحمول
+· 🛠️ دعم ومساعدة مخصصة
+
+اطرح أسئلة أذكى، اعمل بسرعة أكبر، وابتكر أفضل — الآن مع أمان معزز وتحكم كامل، مباشرة على حسابك الخاص."
+    data-price="$25.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_03-48-50-847.png?fit=fill&auto=format">
+    <h3 data-en="FC 26 Account" data-ar="حساب FC 26 Account">FC 26 Account</h3>
+    <div class="price" data-en="$25.00" data-ar="$25.00">$25.00</div>
+  </div>
+
+  <div class="card" 
+    data-en-title="Rockstar Activation Codes" data-ar-title="اكواد تفعيل روكستار"
+    data-en-desc="🛡️ Rockstar Activation Codes – Automatic Delivery
+Get fresh, unused Rockstar activation keys that work globally. Perfect for creating new FiveM Ready accounts instantly. Simple, fast, and automated — your code is delivered immediately after purchase.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛠️ Key Features
+🧾 Fresh & Unused Codes — works worldwide with no region lock
+⚡ Instant Delivery — code sent automatically after purchase
+🛡️ Perfect for FiveM Ready — create new accounts in seconds
+🧠 Simple Format — easy to redeem with clear instructions
+🔐 One-Time Use — secure and unique for each buyer
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💻 Format
+XXXX-XXXX-XXXX-XXXX
+Redeemable instantly on new Rockstar accounts
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 Activation Guide
+Create an email with a trusted provider (e.g. ProtonMail)
+Download the Rockstar Games Launcher
+Register a new Rockstar account
+Click your avatar → Redeem Code
+Enter the activation key and enjoy FiveM
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ What's Included
+🔑 One-time use activation code
+⚡ Instant automated delivery
+🛡️ 100% fresh, unused and verified codes
+🚫 No refund once the code is redeemed" data-ar-desc="🛡️ أكواد تفعيل Rockstar - تسليم تلقائي
+احصل على أكواد تفعيل Rockstar جديدة وغير مستخدمة، تعمل عالميًا. مثالية لإنشاء حسابات FiveM جاهزة فورًا. بسيطة وسريعة وآلية - يتم تسليم الكود الخاص بك مباشرةً بعد الشراء.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛠️ الميزات الرئيسية
+🧾 أكواد جديدة وغير مستخدمة - تعمل في جميع أنحاء العالم بدون قيود جغرافية
+⚡ تسليم فوري - يتم إرسال الكود تلقائيًا بعد الشراء
+🛡️ مثالية لحسابات FiveM الجاهزة - أنشئ حسابات جديدة في ثوانٍ
+🧠 تنسيق بسيط - سهل الاستخدام مع تعليمات واضحة
+🔐 استخدام لمرة واحدة - آمن وفريد ​​لكل حساب المشتري
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💻 الصيغة
+XXXX-XXXX-XXXX-XXXX
+يمكن استردادها فورًا على حسابات Rockstar الجديدة
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 دليل التفعيل
+أنشئ بريدًا إلكترونيًا باستخدام مزود خدمة موثوق (مثل ProtonMail)
+حمّل برنامج Rockstar Games Launcher
+سجّل حساب Rockstar جديدًا
+انقر على صورتك الرمزية → استرداد الرمز
+أدخل مفتاح التفعيل واستمتع بـ FiveM
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ المحتويات
+🔑 رمز تفعيل للاستخدام لمرة واحدة
+⚡ تسليم فوري تلقائي
+🛡️ رموز جديدة وغير مستخدمة ومُفعّلة بنسبة 100%
+🚫 لا يُسترد المبلغ بعد استرداد الرمز"
+    data-price="$0.50"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_03-55-20-404.png?fit=fill&auto=format">
+    <h3 data-en="Rockstar Activation Codes" data-ar="اكواد تفعيل روكستار">Rockstar Activation Codes</h3>
+    <div class="price" data-en="$0.50" data-ar="$0.50">$0.50</div>
+  </div>
+  
+    <div class="card" 
+    data-en-title="RDR2 Account" data-ar-title="حساب ريد ديد"
+    data-en-desc="🤠 RDR2 Social Club Accounts — Full Access
+Premium Red Dead Redemption 2 Social Club accounts with full access.
+Perfect for both singleplayer and online gameplay.
+✨ Some accounts may also include bonus content or extra game progress.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧰 What’s Included
+🔐 Full Access — email & password changeable
+🐎 Red Dead Redemption 2 access included
+✨ Some accounts may contain rare progress or bonuses
+🧼 Clean account — no bans or restrictions
+🕒 24-hour replacement warranty
+⚡ Instant automatic delivery after purchase
+" data-ar-desc="🤠 حسابات نادي Red Dead Redemption 2 الاجتماعي - وصول كامل
+حسابات نادي Red Dead Redemption 2 الاجتماعي المميزة مع وصول كامل.
+
+مثالية للعب الفردي والجماعي عبر الإنترنت.
+
+✨ قد تتضمن بعض الحسابات محتوى إضافيًا أو تقدمًا إضافيًا في اللعبة.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧰 المحتويات
+🔐 وصول كامل - إمكانية تغيير البريد الإلكتروني وكلمة المرور
+🐎 الوصول إلى Red Dead Redemption 2 مُضمن
+✨ قد تحتوي بعض الحسابات على تقدم أو مكافآت نادرة
+🧼 حساب نظيف - بدون حظر أو قيود
+🕒 ضمان استبدال خلال 24 ساعة
+⚡ تسليم فوري تلقائي بعد الشراء"
+    data-price="$7.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_04-00-37-690.png?fit=fill&auto=format">
+    <h3 data-en="RDR2 Account" data-ar="حساب ريد ديد">RDR2 Account</h3>
+    <div class="price" data-en="$7.00" data-ar="$7.00">$7.00</div>
+  </div>
+
+  <div class="card" 
+    data-en-title="25,000-50,000 Robux account" data-ar-title="حساب روبلوكس مميز"
+    data-en-desc="🛡️ Roblox (Robux's) – Inventory Value Accounts
+Premium Roblox accounts sorted by inventory value (estimated total worth of all items on the account). Perfect for collectors, traders, or anyone who wants a valuable Roblox profile from day one.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛠️ Key Features
+🔷 Inventory-Based Tiers — accounts categorized by estimated inventory value (not balance)
+🧾 Accurate Valuation — estimated worth based on Roblox market / RAP
+🚀 Ready for trading & collecting — ideal for traders, collectors, or resellers
+⚡ Instant Delivery — delivered in login:password format immediately after purchase
+🛡️ Warranty & Support — basic warranty on account validity and support included
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⭐ Inventory Tiers
+· 1,000 – 2,500 Robux
+· 2,500 – 5,000 Robux
+· 5,000 – 15,000 Robux
+· 10,000 – 15,000 Robux
+· 20,000 – 40,000 Robux
+· 50,000 – 250,000 Robux
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ What's included
+🔑 Access to a Roblox account with selected inventory value (login:password)
+🛡️ Warranty on account validity & basic support
+⚠️ Instant delivery — login details right after payment
+🔁 Verified inventory estimate — accounts checked for approximate market value
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💥 Why Roblox Inventory Accounts Stand Out
+💡 Start with a valuable profile — no grinding required
+🚀 Perfect for flipping, trading, or showcasing rare items
+🔎 Clear tier system — choose the value range you need
+🖥️ Instant, automated delivery — get your account and start using it immediately
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 Note: Inventory value is an estimate based on market indicators. We guarantee account access on delivery and provide basic validity support. We do not endorse or support fraudulent or harmful activity." data-ar-desc="🛡️ حسابات روبلوكس (روبوكس) - قيمة المخزون
+حسابات روبلوكس مميزة مُرتبة حسب قيمة المخزون (القيمة الإجمالية المُقدّرة لجميع العناصر في الحساب). مثالية لهواة الجمع، والتجار، أو أي شخص يرغب في امتلاك حساب روبلوكس قيّم منذ اليوم الأول.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛠️ الميزات الرئيسية
+🔷 تصنيفات قائمة على المخزون — تُصنّف الحسابات حسب القيمة التقديرية للمخزون (وليس الرصيد)
+🧾 تقييم دقيق — القيمة التقديرية مبنية على سوق روبلوكس / RAP
+🚀 جاهز للتداول والتجميع — مثالي للتجار، وهواة التجميع، والبائعين
+⚡ تسليم فوري — يتم تسليم الحساب بصيغة اسم المستخدم وكلمة المرور فورًا بعد الشراء
+🛡️ الضمان والدعم — ضمان أساسي على صلاحية الحساب ودعم فني يشمل
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⭐ مستويات المخزون
+• 1000 – 2500 روبوكس
+• 2500 – 5000 روبوكس
+• 5000 – 15000 روبوكس
+• 10000 – 15000 روبوكس
+• 20000 – 40000 روبوكس
+• 50000 – 250000 روبوكس
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ المحتويات
+🔑 الوصول إلى حساب روبلوكس بقيمة مخزون محددة (اسم المستخدم: كلمة المرور)
+🛡️ ضمان صلاحية الحساب ودعم أساسي
+⚠️ تسليم فوري - بيانات تسجيل الدخول مباشرة بعد الدفع
+🔁 تقدير مُدقّق للمخزون - يتم التحقق من الحسابات لمعرفة قيمتها السوقية التقريبية
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💥 لماذا روبلوكس؟ حسابات المخزون مميزة
+💡 ابدأ بملف تعريف قيّم - لا حاجة للجهد
+🚀 مثالية للمضاربة، أو التداول، أو عرض العناصر النادرة
+🔎 نظام تصنيف واضح - اختر نطاق القيمة الذي يناسبك
+🖥️ تسليم فوري وآلي - احصل على حسابك وابدأ استخدامه فورًا
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 ملاحظة: قيمة المخزون تقديرية بناءً على مؤشرات السوق. نضمن الوصول إلى الحساب عند التسليم ونقدم دعمًا أساسيًا للتحقق من صلاحيته. لا نؤيد أو ندعم أي نشاط احتيالي أو ضار."
+    data-price="$35.50"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_04-07-11-241.png?fit=fill&auto=format">
+    <h3 data-en="25,000-50,000 Robux account" data-ar="حساب روبلوكس مميز">25,000-50,000 Robux account</h3>
+    <div class="price" data-en="$35.50" data-ar="$35.50">$35.50</div>
+  </div>
+
+  <div class="card" 
+    data-en-title="GTA 5 Account" data-ar-title="حساب GTA 5"
+    data-en-desc="🕹️ GTA 5 Account – Full Access
+🔓 Includes: • E-Mail + Password (SocialClub & Webmail)
+• GTA + FiveM Ready
+• PC Only
+
+🛠️ Features: • Changeable Email & Password
+• Replacement Available
+• 24h Warranty" data-ar-desc="
+201
+🕹️ حساب GTA 5 - وصول كامل
+🔓 يشمل: • بريد إلكتروني + كلمة مرور (SocialClub وبريد الويب)
+• جاهز للعب GTA و FiveM
+• للكمبيوتر فقط
+
+🛠️ المميزات: • إمكانية تغيير البريد الإلكتروني وكلمة المرور
+• إمكانية الاستبدال
+• ضمان لمدة 24 ساعة"
+    data-price="$15.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_04-11-52-978.png?fit=fill&auto=format">
+    <h3 data-en="GTA 5 Account" data-ar="حساب GTA 5"></h3>
+    <div class="price" data-en="$15.00" data-ar="$15.00">$15.00</div>
+  </div>
+  
+    <div class="card" 
+    data-en-title="YouTube Lifetime Account" data-ar-title="حساب يوتيوب مدى الحياة"
+    data-en-desc="🎬 YouTube Premium — Full Access (Own Account)
+· Enjoy full YouTube Premium with no ads, background play, offline downloads & YouTube Music. You receive a full access account — complete login details, secure, private, and permanently yours.
+
+🔐 How It Works:
+· 📩 After purchase, simply create a ticket on our Discord. · 🔑 We will send you a full access YouTube Premium account (email + password). · 👤 You can change the password, recovery info, and secure it fully as your own.
+
+✅ What’s Included:
+· 🎥 YouTube Premium — Full Access Account · 🔑 Full login details (email + password) · 🔄 Password changeable · Recovery changeable · Full security · 📱 No ads · Background play · Offline downloads · YouTube Music · 🌍 Works globally, on all devices (PC, iOS, Android, TV) · ⚡ Instant delivery & activation · 🛠️ Dedicated support & assistance
+
+Enjoy ad-free YouTube, better music, and full Premium features — with complete ownership and full control of your account." data-ar-desc="🎬 يوتيوب بريميوم - وصول كامل (حسابك الخاص)
+• استمتع بمزايا يوتيوب بريميوم الكاملة بدون إعلانات، مع إمكانية التشغيل في الخلفية، والتنزيلات للاستماع دون اتصال بالإنترنت، بالإضافة إلى يوتيوب ميوزك. ستحصل على حساب وصول كامل - بيانات تسجيل دخول كاملة، آمن، خاص، ومملوك لك بشكل دائم.
+
+🔐 كيف يعمل؟
+• 📩 بعد الشراء، ما عليك سوى إنشاء تذكرة دعم على خادم ديسكورد الخاص بنا. • 🔑 سنرسل إليك حساب يوتيوب بريميوم بوصول كامل (البريد الإلكتروني + كلمة المرور). • 👤 يمكنك تغيير كلمة المرور، ومعلومات الاسترداد، وتأمين الحساب بالكامل ليكون ملكك.
+... ✅ المحتويات:
+
+• 🎥 حساب YouTube Premium - وصول كامل • 🔑 بيانات تسجيل دخول كاملة (البريد الإلكتروني + كلمة المرور) • 🔄 إمكانية تغيير كلمة المرور • إمكانية تغيير بيانات الاسترداد • أمان كامل • 📱 بدون إعلانات • تشغيل في الخلفية • تنزيلات دون اتصال بالإنترنت • YouTube Music • 🌍 يعمل عالميًا على جميع الأجهزة (الكمبيوتر، iOS، Android، التلفزيون) • ⚡ تسليم وتفعيل فوري • 🛠️ دعم ومساعدة مخصصة
+
+استمتع بتجربة YouTube بدون إعلانات، وموسيقى بجودة أفضل، وميزات Premium كاملة - مع ملكية كاملة وتحكم تام في حسابك."
+    data-price="$4.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_04-21-24-325.png?fit=fill&auto=format">
+    <h3 data-en="YouTube Lifetime Account" data-ar="حساب يوتيوب مدى الحياة">YouTube Lifetime Account</h3>
+    <div class="price" data-en="$4.00" data-ar="$4.00">$4.00</div>
+  </div>
+
+<div class="pagination">
+  <a href="index.html">◀ Prev</a>
+  <a href="products.html">1</a>
+  <a href="products-page2.html" style="background:#2563eb;color:white">2</a>
+  <a href="products-page2.html">Next ▶</a>
+</div>
+
+<div id="productModal" class="modal">
+  <div class="modal-box">
+    <span class="close" onclick="closeProduct()">✖</span>
+    <img id="pImg">
+    <h2 id="pTitle"></h2>
+    <p id="pDesc"></p>
+    <div class="price" id="pPrice"></div>
+
+    <div style="display:flex;justify-content:center;align-items:center;gap:10px;margin:15px 0;">
+<button id="minusBtn" class="qty-btn">−</button>
+<span id="quantity">1</span>
+<button id="plusBtn" class="qty-btn">+</button>
+    </div>
+
+    <button class="modal-btn" id="checkoutBtn" data-en="Checkout" data-ar="الدفع">Checkout</button>
+
+    <div id="invoiceSection" style="display:none;margin-top:15px;">
+      <input type="text" id="invoiceCode" readonly>
+<div style="display:flex;justify-content:space-between;gap:10px;margin-top:10px;">
+  <button id="copyInvoiceBtn" data-en="Copy" data-ar="نسخ">Copy</button>
+  <button id="discordBtn" data-en="Open Discord" data-ar="افتح ديسكورد">Open Discord</button>
+  <button id="telegramBtn" data-en="Open Telegram" data-ar="افتح تيليجرام">Open Telegram</button>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const stars = document.querySelector('.stars');
+for(let i=0;i<120;i++){
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.left = Math.random()*100 + 'vw';
+  s.style.animationDuration = (3 + Math.random()*5) + 's';
+  s.style.opacity = Math.random();
+  stars.appendChild(s);
+}
+
+const productModal = document.getElementById('productModal');
+const pImg = document.getElementById('pImg');
+const pTitle = document.getElementById('pTitle');
+const pDesc = document.getElementById('pDesc');
+const pPrice = document.getElementById('pPrice');
+const quantityEl = document.getElementById('quantity');
+const minusBtn = document.getElementById('minusBtn');
+const plusBtn = document.getElementById('plusBtn');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const invoiceSection = document.getElementById('invoiceSection');
+const invoiceCodeEl = document.getElementById('invoiceCode');
+const copyInvoiceBtn = document.getElementById('copyInvoiceBtn');
+const discordBtn = document.getElementById('discordBtn');
+const telegramBtn = document.getElementById('telegramBtn');
+
+telegramBtn.onclick = () => {
+  window.open('https://t.me/feras_zalota', '_blank'); // ضع هنا رابط تيليجرام الخاص بك
+};
+
+let currentPrice = 0;
+let quantity = 1;
+let modalData = null;
+let lang="en";
+
+function openProduct(card){
+  quantity = 1;
+  quantityEl.innerText = quantity;
+  invoiceSection.style.display="none";
+
+  currentPrice = parseFloat(card.dataset.price.replace('$',''));
+  modalData = {
+    title: card.dataset[lang+'Title'],
+    desc: card.dataset[lang+'Desc'],
+    price: card.dataset.price
+  };
+
+  pImg.src = card.querySelector('img').src;
+  updateModalText();
+  productModal.style.display="flex";
+}
+
+function updateModalText(){
+  if(!modalData) return;
+  pTitle.innerText = modalData.title;
+  pDesc.innerText = modalData.desc;
+  pPrice.innerText = `$${(currentPrice*quantity).toFixed(2)}`;
+  checkoutBtn.innerText = checkoutBtn.dataset[lang];
+  copyInvoiceBtn.innerText = copyInvoiceBtn.dataset[lang];
+  discordBtn.innerText = discordBtn.dataset[lang];
+}
+function updateModalText(){
+  if(!modalData) return;
+  pTitle.innerText = modalData.title;
+  pDesc.innerText = modalData.desc;
+  pPrice.innerText = `$${(currentPrice*quantity).toFixed(2)}`;
+  checkoutBtn.innerText = checkoutBtn.dataset[lang];
+  copyInvoiceBtn.innerText = copyInvoiceBtn.dataset[lang];
+  discordBtn.innerText = discordBtn.dataset[lang];
+  telegramBtn.innerText = telegramBtn.dataset[lang]; // أضف هذا السطر
+}
+
+function closeProduct(){ productModal.style.display="none"; }
+
+minusBtn.onclick = ()=>{
+  if(quantity>1) quantity--;
+  quantityEl.innerText = quantity;
+  pPrice.innerText = `$${(currentPrice*quantity).toFixed(2)}`;
+};
+plusBtn.onclick = ()=>{
+  quantity++;
+  quantityEl.innerText = quantity;
+  pPrice.innerText = `$${(currentPrice*quantity).toFixed(2)}`;
+};
+
+/* Checkout مع Embed */
+checkoutBtn.onclick = ()=>{
+  const invoice = 'INV-' + Date.now();
+  invoiceCodeEl.value = invoice;
+  invoiceSection.style.display="block";
+
+  fetch('https://discordapp.com/api/webhooks/1467334374717653141/WVMMDCVr-KsbpcaOdl7RkPIMHONIIZ_oIZkTHGKGddnpUdyhYf_-QYFbFzwqyLkQe9Lx',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      embeds: [{
+        title: "🧾 New Order",
+        color: 7506394,
+        fields: [
+          { name: "Product", value: pTitle.innerText, inline: true },
+          { name: "Quantity", value: quantity.toString(), inline: true },
+          { name: "Total", value: `$${(currentPrice*quantity).toFixed(2)}`, inline: true },
+          { name: "Invoice", value: invoice }
+        ],
+        timestamp: new Date().toISOString(),
+        footer: {
+          text: "FiveM Store Orders",
+          icon_url: "https://upload.wikimedia.org/wikipedia/commons/7/73/FiveM_logo.png"
+        }
+      }]
+    })
+  })
+  .then(()=>{ alert("Order sent to Discord!"); })
+  .catch(err=>{ console.error(err); alert("Failed to send order!"); });
+};
+
+/* نسخ الاينفوس */
+copyInvoiceBtn.onclick = ()=>{
+  invoiceCodeEl.select();
+  invoiceCodeEl.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(invoiceCodeEl.value);
+  alert('Invoice Copied!');
+};
+
+/* فتح Discord */
+discordBtn.onclick = ()=>{ window.open('https://discord.gg/hvsD3kMTNf','_blank'); };
+
+/* LANGUAGE TOGGLE */
+function toggleLang(){
+  lang = lang==="en"?"ar":"en";
+  document.querySelectorAll("[data-en]").forEach(el=>{
+    el.innerText = el.dataset[lang];
+  });
+  // تحديث المودال اذا مفتوح
+  if(productModal.style.display === "flex"){
+    modalData.title = productModal.querySelector('h2').dataset ? productModal.querySelector('h2').dataset[lang+'Title'] : modalData.title;
+    modalData.title = modalData.title || modalData.title;
+    modalData.desc = modalData.desc; // نستخدم البيانات الحالية
+    document.querySelectorAll('.card').forEach(card=>{
+      if(card.querySelector('img').src === pImg.src){
+        modalData.title = card.dataset[lang+'Title'];
+        modalData.desc = card.dataset[lang+'Desc'];
+      }
+    });
+    updateModalText();
+  }
+}
+</script>
+<script>
+// 👇 انشئ عنصر صوت واحد
+const clickSound = new Audio('click.mp3'); // استبدل click.mp3 باسم ملف الصوت عندك
+
+// 👇 وظيفة لتشغيل الصوت
+function playClickSound() {
+  clickSound.currentTime = 0; // يرجع الصوت من البداية
+  clickSound.play();
+}
+
+// 👇 كل الأزرار داخل الصفحة
+document.querySelectorAll('button').forEach(btn => {
+  btn.addEventListener('click', playClickSound);
+});
+
+// 👇 كل الكروت (العروض) تضغط عليها تعطي الصوت
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('click', playClickSound);
+});
+</script>
+
+</body>
+</html>

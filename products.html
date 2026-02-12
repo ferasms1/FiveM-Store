@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Products | FiveM Store</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ========= كل التنسيقات الأصلية ========= */
+.store-title{
+  position:relative;
+  display:inline-block;
+  padding:14px 34px;
+  font-size:48px;
+  font-weight:900;
+  background:linear-gradient(90deg,#1e40af,#7c3aed);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  border-radius:14px;
+}
+.store-title::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:14px;
+  border:2px solid #7c3aed;
+  box-shadow:
+    0 0 6px #7c3aed,
+    0 0 14px #3b82f6,
+    0 0 28px rgba(124,58,237,.8);
+  animation:electric 1.6s infinite;
+  pointer-events:none;
+}
+@keyframes electric{
+  0%{opacity:.15;box-shadow:0 0 4px #3b82f6;}
+  20%{opacity:1;box-shadow:0 0 8px #7c3aed,0 0 18px #3b82f6;}
+  40%{opacity:.3;}
+  60%{opacity:1;box-shadow:0 0 12px #7c3aed,0 0 30px rgba(59,130,246,.9);}
+  100%{opacity:.2;box-shadow:0 0 6px #3b82f6;}
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:Arial, Helvetica, sans-serif;
+  color:#fff;
+  background:
+    linear-gradient(rgba(2,6,23,.9),rgba(2,6,23,.95)),
+    url("https://filecr.com/_next/image/?url=https:%2F%2Fmedia.imgcdn.org%2Frepo%2F2025%2F03%2Fgrand-theft-auto-v-enhanced%2F67cf2003279aa-grand-theft-auto-v-enhanced-screenshot4.webp&w=1920&q=75");
+  background-size:cover;
+  background-position:center;
+  background-attachment:fixed;
+}
+.header{text-align:center;padding:50px 20px;position:relative;}
+.header h1{font-size:48px;font-weight:900;background:linear-gradient(90deg,#003d9e,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.header p{color:#94a3b8;margin-top:10px;}
+.products{padding:40px 60px;display:grid;grid-template-columns:repeat(4, 1fr);gap:22px;}
+@media(max-width:1100px){.products{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){.products{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.products{grid-template-columns:1fr}}
+.card{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:16px;
+  padding:14px;
+  cursor:pointer;
+  transition:.3s;
+  text-align:center;
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 0 30px rgba(124,58,237,.4);
+}
+.card img{
+  width:100%;
+  height:180px;          /* قللنا شوي عن 200px */
+  object-fit:contain;    /* تظهر الصورة كاملة */
+  border-radius:12px;
+  margin-bottom:10px;
+  background:#020617;    /* خلفية الفراغ حول الصورة */
+  padding:5px;           /* قلل الفراغ الداخلي قليلًا */
+}
+.card h3{
+  font-size:16px;
+  margin-bottom:6px
+}
+.price{
+  color:#3b82f6;
+  font-weight:bold
+}
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+.modal-box{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:20px;
+  padding:25px;
+  width:90%;
+  max-width:520px;
+  text-align:center;
+  position:relative;
+}
+.modal-box img{
+  width:100%;          /* بدل 100% عشان تصغر الصورة */
+  max-height:430px;   /* أقصى ارتفاع للصورة */
+  object-fit:cover;   /* يحافظ على النسب */
+  border-radius:14px;
+  margin-bottom:10px; /* تخلي المسافة أقل بين الصورة والنص */
+}
+
+.modal-box p{
+  color:#94a3b8;
+  margin:8px 0;       /* تخلي المسافة بين الفقرات أقل */
+  max-height:150px;   /* يمنع النص الطويل من زيادة ارتفاع المودال */
+  overflow-y:auto;    /* لو النص طويل يضيف شريط تمرير */
+  text-align:center;  /* يجعل النص مرتب */
+}
+.close{position:absolute;top:15px;right:20px;cursor:pointer}
+.pagination{
+  display:flex;
+  justify-content:center; /* يوسّط الأزرار أفقياً */
+  align-items:center;     /* يوسّط العناصر رأسياً إذا في حاجة */
+  gap:10px;               /* مسافة بين الأزرار */
+  padding:20px 0;         /* مسافة فوق وتحت فقط */
+  margin:0 auto;          /* يوسّط pagination نفسه داخل الصفحة */
+}
+
+.pagination a {
+  display: inline-flex;      /* خليها flex عشان text-align ما يأثر */
+  justify-content: center;
+  align-items: center;
+  padding: 10px 18px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  color: #c7d2fe;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.pagination a:hover {
+  background: linear-gradient(90deg,#7c3aed,#2563eb);
+  color: white;
+}
+.stars{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.star{position:absolute;top:-10px;width:2px;height:2px;background:white;opacity:.8;animation:fall linear infinite;}
+@keyframes fall{to{transform:translateY(110vh);}}
+.header, .products, .pagination {position:relative;z-index:1;}
+#quantity{font-size:18px;font-weight:bold;margin:0 10px;}
+#invoiceSection input{width:100%;padding:10px;margin-bottom:8px;border-radius:8px;border:none;background:#1e293b;color:white;text-align:center;}
+#invoiceSection button{padding:10px 18px;border-radius:8px;border:none;font-weight:bold;cursor:pointer;}
+.lang-btn{
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:linear-gradient(90deg,#7c3aed,#2563eb);
+  color:white;
+  padding:8px 14px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+  z-index:2;
+}
+/* ====== FIX أزرار + - ====== */
+.qty-btn{
+  background: linear-gradient(135deg,#7c3aed,#2563eb) !important;
+  color: #fff !important;
+  font-size: 26px !important;
+  font-weight: 900;
+  width: 55px;
+  height: 55px;
+  border-radius: 14px;
+  border: none !important;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(124,58,237,.6);
+  transition: .2s ease;
+}
+
+.qty-btn:hover{
+  transform: scale(1.08);
+  box-shadow: 0 0 28px rgba(124,58,237,.9);
+}
+/* ====== زر Checkout القوي ====== */
+#checkoutBtn{
+  width:100%;
+  margin-top:15px;
+  padding:16px 0;
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:1px;
+  text-transform:uppercase;
+
+  background: linear-gradient(135deg,#00158b,#4a008f);
+  color:#fff;
+
+  border:none;
+  border-radius:16px;
+  cursor:pointer;
+
+  box-shadow:
+    0 0 15px rgba(87, 0, 128, 0.527),
+    0 0 35px rgba(0, 3, 182, 0.4);
+
+  transition: .25s ease;
+}
+
+/* Hover */
+#checkoutBtn:hover{
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 0 25px rgba(87, 0, 128, 0.527),
+    0 0 55px rgba(0, 3, 182, 0.4);
+}
+
+/* Click */
+#checkoutBtn:active{
+  transform: scale(.97);
+}
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+
+<!-- زر الترجمة -->
+<button class="lang-btn" onclick="toggleLang()">🌐 AR / EN</button>
+
+<div class="header">
+  <h1 class="store-title">FiveM Store</h1>
+  <p data-en="The best international products that everyone is looking for are available in FiveM Store" data-ar="FiveM Store افضل المنتجات العالمية التي يبحث عنها الجميع موجودة في ">The best international products that everyone is looking for are available in FiveM Store</p>
+</div>
+
+<div class="products">
+
+  <div class="card" 
+    data-en-title="FiveM Ready [ Fresh ]" data-ar-title="حساب جاهز لفايف ام"
+    data-en-desc="About FiveM Ready [ Fresh ]
+🛡️ FiveM Ready [Fresh] – Full Access Accounts
+Get fresh FiveM Ready accounts instantly. Ideal for unbans and spoofers, fully compatible with FiveM servers. Fast delivery, secure accounts, and guaranteed full access.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛠️ Key Features
+🧾 Email : Password Format — easy to use, ready for login
+🔐 Full Access — ability to change both e-mail & password
+🧠 Spoofer & Unban Ready — optimized for FiveM use only
+⚡ Instant Delivery — automated system for immediate access
+📨 Webmail Access — included for full control
+🔁 Free Replacement — available if needed within warranty period
+🛡️ 48h Warranty — fast support & protection after purchase
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💥 Why FiveM Ready Stands Out
+💡 Perfect for bypassing bans or starting fresh
+🚀 Instant access after payment
+🔁 Full account control included
+🥇 First provider on the market offering stable FiveM accounts
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌐 Webmail: https://outlook.live.com/mail/0/" data-ar-desc="🛡️ FiveM Ready [جديد] – حسابات كاملة الوصول
+احصل على حسابات FiveM Ready جديدة على الفور. مثالية لإزالة الحظر وبرامج التزييف، متوافقة تمامًا مع خوادم FiveM. توصيل سريع، حسابات آمنة، وضمان الوصول الكامل.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛠️ الميزات الرئيسية
+🧾 البريد الإلكتروني : صيغة كلمة المرور — سهلة الاستخدام، جاهزة لتسجيل الدخول
+🔐 الوصول الكامل — القدرة على تغيير البريد الإلكتروني وكلمة المرور
+🧠 جاهزة للتزييف وإزالة الحظر — محسّنة للاستخدام مع FiveM فقط
+⚡ توصيل فوري — نظام آلي للوصول الفوري
+📨 الوصول للبريد الإلكتروني — مضمن للتحكم الكامل
+🔁 استبدال مجاني — متوفر إذا لزم الأمر خلال فترة الضمان
+🛡️ ضمان 48 ساعة — دعم سريع وحماية بعد الشراء
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💥 لماذا تبرز FiveM Ready
+💡 مثالية لتجاوز الحظر أو البدء من جديد
+🚀 وصول فوري بعد الدفع
+🔁 التحكم الكامل بالحساب متاح
+🥇 أول مزود في السوق يقدم حسابات FiveM مستقرة
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌐 البريد الإلكتروني: https://outlook.live.com/mail/0/"
+    data-price="$0.80"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-01_05-26-45-530.png?fit=fill&auto=format">
+    <h3 data-en="FiveM Ready [ Fresh ]" data-ar="حساب جاهز لفايف ام">FiveM Ready [ Fresh ]</h3>
+    <div class="price" data-en="$0.80" data-ar="$0.80">$0.80</div>
+  </div>
+
+<div class="card" 
+    data-en-title="Netflix Lifetime" data-ar-title=" نتفلكس مدى الحياة"
+    data-en-desc="🎬 Netflix Lifetime Account
+· Unlimited movies & shows — one payment, lifetime access. Enjoy all the benefits of Netflix Premium without monthly fees.
+
+✅ What’s Included:
+· 🔥 Netflix Premium – Lifetime access
+
+· 👪 Supports up to 4 devices at once (UHD/4K)
+
+· 🌍 Works globally – no region lock
+
+· 📱 Watch on Smart TVs, phones, tablets, and more
+
+· ⚡ Instant delivery after purchase
+
+· 🛠️ Full support provided
+
+Binge your favorite series forever. One-time purchase, endless entertainment." data-ar-desc="🎬 حساب Netflix Lifetime
+· أفلام وعروض غير محدودة — دفعة واحدة، وصول مدى الحياة. استمتع بجميع مزايا Netflix Premium بدون رسوم شهرية.
+
+✅ ما هو متضمن:
+· 🔥 Netflix Premium – وصول مدى الحياة
+
+· 👪 يدعم حتى 4 أجهزة في نفس الوقت (UHD/4K)
+
+· 🌍 يعمل عالميًا – بدون قيود على المنطقة
+
+· 📱 شاهد على التلفزيونات الذكية، الهواتف، الأجهزة اللوحية، وأكثر
+
+· ⚡ تسليم فوري بعد الشراء
+
+· 🛠️ دعم كامل مقدم
+
+تابع مسلسلاتك المفضلة إلى الأبد. شراء لمرة واحدة، ترفيه بلا نهاية."
+    data-price="$1.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/rdeW2Ay.png?fit=fill&auto=format">
+    <h3 data-en="Netflix Lifetime" data-ar="حساب نيتفلكس مدة الحياة">Netflix Lifetime</h3>
+    <div class="price" data-en="$1.00" data-ar="$1.00">$1.00</div>
+  </div>
+
+  <div class="card" 
+    data-en-title="Chat GPT Lifetime" data-ar-title="ذكاء اصطناعي مدى الحياة"
+    data-en-desc="🤖 ChatGPT Plus — Lifetime Access (On Your E-Mail)
+· Unlock the full power of AI — now easier, safer, and smarter than ever. No more account sharing — we add ChatGPT Plus directly to your own email for maximum security and control.
+
+🔐 How It Works:
+· 📩 After purchase, simply create a ticket on our Discord and send us the email you want to use. · 🧠 We’ll add ChatGPT Plus (GPT-5) to that email — usually within minutes.
+
+✅ What’s Included:
+· 🚀 ChatGPT Plus (GPT-5) — Lifetime access · 🔄 Works on your own email (more secure & private) · ⏱️ Priority access even during high demand · ⚡ Faster responses & enhanced performance · 🌐 Works globally, on web & mobile · 🛠️ Dedicated support & assistance
+
+Ask smarter, work faster, and create better — now with enhanced security and full control, directly on your own account." data-ar-desc="🤖 ChatGPT Plus — وصول مدى الحياة (على بريدك الإلكتروني)
+· افتح القوة الكاملة للذكاء الاصطناعي — الآن أصبح الأمر أسهل وأكثر أمانًا وذكاءً من أي وقت مضى. لا مزيد من مشاركة الحسابات — نحن نضيف ChatGPT Plus مباشرة إلى بريدك الإلكتروني الخاص لتحقيق أقصى درجات الأمان والتحكم.
+
+🔐 كيف يعمل:
+· 📩 بعد الشراء، قم ببساطة بإنشاء تذكرة على Discord الخاص بنا وأرسل لنا البريد الإلكتروني الذي تريد استخدامه.
+· 🧠 سنضيف ChatGPT Plus (GPT-5) إلى هذا البريد الإلكتروني — عادةً خلال دقائق.
+
+✅ ما هو مشمول:
+· 🚀 ChatGPT Plus (GPT-5) — وصول مدى الحياة
+· 🔄 يعمل على بريدك الإلكتروني الخاص (أكثر أمانًا وخصوصية)
+· ⏱️ وصول ذو أولوية حتى أثناء الطلب العالي
+· ⚡ استجابات أسرع وأداء محسّن
+· 🌐 يعمل عالميًا على الويب والهاتف المحمول
+· 🛠️ دعم ومساعدة مخصصة
+
+اطرح أسئلة أذكى، اعمل بسرعة أكبر، وابتكر أفضل — الآن مع أمان معزز وتحكم كامل، مباشرة على حسابك الخاص."
+    data-price="$2.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-01_05-17-19-631.png?fit=fill&auto=format">
+    <h3 data-en="Chat GPT Lifetime" data-ar="ذكاء اصطناعي مدى الحياة">Chat GPT Lifetime</h3>
+    <div class="price" data-en="$2.00" data-ar="$2.00">$2.00</div>
+  </div>
+
+  <div class="card" 
+    data-en-title="1 X 14 Boosts" data-ar-title="14 بوست لمدة شهر"
+    data-en-desc="About 14x 1 Month Server Boosts
+🛡️ 14× 1 Month Server Boosts – Instant Level 3
+Boost your Discord server to the next level in seconds — get full Level 3 perks instantly with 14× 1 Month Boosts. Perfect for communities, events, premium setups, or anyone who wants their server to shine.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛠️ Key Features
+🚀 14× Server Boosts (1 Month) — instantly upgrade any server to Level 3
+
+⚡ Instant Delivery — boosts delivered right after payment
+
+🖥️ Works on any server — no restrictions
+
+💬 Support Included — quick help whenever you need it
+
+🌟 One-Time Purchase — full power, no subscription
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💥 Why 14× Server Boosts Stands Out
+💡 Instantly unlocks Level 3 perks on your server
+🛡️ Secure and fast delivery
+🔁 Compatible with any Discord server
+🖥️ Simple setup — no extra steps needed" data-ar-desc="حوالي 14 تعزيز خادم لمدة شهر واحد
+🛡️ 14× تعزيز خادم لمدة شهر واحد – المستوى 3 الفوري
+قم بترقية خادم Discord الخاص بك إلى المستوى التالي في ثوانٍ — احصل على جميع مزايا المستوى 3 فورًا مع 14× تعزيز لمدة شهر واحد. مثالي للمجتمعات، الأحداث، الإعدادات المميزة، أو لأي شخص يريد أن يلمع خادمه.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛠️ الميزات الرئيسية
+🚀 14× تعزيز خادم (لمدة شهر) — ترقية أي خادم إلى المستوى 3 فورًا
+
+⚡ التسليم الفوري — التعزيزات تصل مباشرة بعد الدفع
+
+🖥️ يعمل على أي خادم — بدون قيود
+
+💬 الدعم متاح — مساعدة سريعة كلما احتجت إليها
+
+🌟 شراء لمرة واحدة — قوة كاملة، بدون اشتراك
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💥 لماذا يبرز 14× تعزيز خادم
+💡 يفتح فوريًا مزايا المستوى 3 على خادمك
+🛡️ تسليم آمن وسريع
+🔁 متوافق مع أي خادم Discord
+🖥️ إعداد بسيط — لا خطوات إضافية مطلوبة"
+    data-price="$5.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-01_05-40-53-696.png?fit=fill&auto=format">
+    <h3 data-en="1 X 14 Boosts" data-ar="14 بوست لمدة شهر">1 X 14 Boosts</h3>
+    <div class="price" data-en="$5.00" data-ar="$5.00">$5.00</div>
+  </div>
+  
+    <div class="card" 
+    data-en-title="Minecraft Account" data-ar-title="ماينكرافت"
+    data-en-desc="⛏️ Minecraft Accounts – Full Access
+Get your own Minecraft account with full control, guaranteed clean status, and instant delivery.
+Perfect for new players, builders, or resellers who want secure and fresh accounts.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧠 What You Get
+✅ Never used — brand new, never logged in
+🔐 Full Access — email + password + skin fully changeable
+🚫 Not banned — clean on all servers
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛡️ Account Features
+100% Full Access — change email, password & skin anytime
+✨ Brand New — never touched, zero history
+🧼 Clean on all servers — guaranteed no bans
+⚡ Instant Delivery after purchase
+" data-ar-desc="⛏️ حسابات ماين كرافت – وصول كامل
+احصل على حساب ماين كرافت الخاص بك مع التحكم الكامل، حالة نظيفة مضمونة، وتسليم فوري.
+مثالي للاعبين الجدد، البناة، أو البائعين الذين يريدون حسابات آمنة وجديدة.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧠 ما ستحصل عليه
+✅ لم يُستخدم من قبل — جديد تمامًا، لم يتم تسجيل الدخول إليه أبدًا
+🔐 وصول كامل — البريد الإلكتروني + كلمة المرور + تغيير الجلد بالكامل
+🚫 غير محظور — نظيف على جميع السيرفرات
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛡️ ميزات الحساب
+100% وصول كامل — يمكنك تغيير البريد الإلكتروني، كلمة المرور والجلد في أي وقت
+✨ جديد تمامًا — لم يُستخدم من قبل، لا يوجد تاريخ
+🧼 نظيف على جميع السيرفرات — مضمون بدون حظر
+⚡ تسليم فوري بعد الشراء"
+    data-price="$7.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_00-23-46-677.png?fit=fill&auto=format">
+    <h3 data-en="Minecraft Account" data-ar="حساب ماينكرافت">Minecraft Account</h3>
+    <div class="price" data-en="$7.00" data-ar="$7.00">$7.00</div>
+  </div>
+
+  <div class="card" 
+    data-en-title="Fortnite Account OG" data-ar-title="حساب فورت نايت نادر"
+    data-en-desc="🎮 Fortnite Accounts
+⭐ All accounts are: • 🔐 Safe & secure to use
+• ✅ Full access guaranteed
+• 💎 High quality & clean logins
+• 🌍 From trusted sources
+• ♻️ Covered by 24-hour replacement warranty
+
+🔽 Tier Guide & Features:
+✨ 100–150 Skins • OG + rare skin mix
+• May include: Black Knight, Minty Axe
+• 🕺 Includes exclusive emotes (e.g., Take the L)
+• High chance of rare or valuable cosmetics
+
+✨ 150–250 Skins • Larger collection of OG & rare skins
+• Often includes: Minty Axe, Black Knight
+• Emotes + rare items likely
+
+🔥 100–250 [ Tryhard Skins Only ] • Packed with sweaty & popular skins
+• 50+ skins from the Item Shop
+• OG tryhard cosmetics may be present
+
+✨ 250–400 Skins • Massive skin library with many exclusives
+• 🎁 Includes random assortment of legendary items
+• Possible to find ultra-rare skins" data-ar-desc="🎮 حسابات فورتنايت
+⭐ جميع الحسابات: • 🔐 آمنة ومحفوظة للاستخدام
+• ✅ وصول كامل مضمون
+• 💎 عالية الجودة وتسجيل دخول نظيف
+• 🌍 من مصادر موثوقة
+• ♻️ مغطاة بضمان استبدال لمدة 24 ساعة
+
+🔽 دليل المستويات والميزات:
+✨ 100–150 زي • مزيج من الملابس الأصلية OG ونادرة
+• قد تشمل: الفارس الأسود، فأس مينتي
+• 🕺 يشمل حركات راقصة حصرية (مثل Take the L)
+• فرصة عالية للحصول على مستحضرات نادرة أو قيمة
+
+✨ 150–250 زي • مجموعة أكبر من الملابس الأصلية OG والنادرة
+• غالبًا ما تشمل: فأس مينتي، الفارس الأسود
+• حركات راقصة + عناصر نادرة محتملة
+
+🔥 100–250 [ ملابس محاولة بجد فقط ] • مليئة بالملابس الشعبية والمجهدة
+• أكثر من 50 زي من متجر العناصر
+• قد تكون المستحضرات OG المتقدمة موجودة
+
+✨ 250–400 زي • مكتبة ضخم من الملابس مع العديد من الحصرية
+• 🎁 يشمل مجموعة عشوائية من العناصر الأسطورية
+• من الممكن العثور على ملابس نادرة جدًا"
+    data-price="$35.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_00-19-29-356.png?fit=fill&auto=format">
+    <h3 data-en="Fortnite Account OG" data-ar="حساب فورت نايت نادر">Fortnite Account OG</h3>
+    <div class="price" data-en="$35.00" data-ar="$35.00">$35.00</div>
+  </div>
+
+  <div class="card" 
+    data-en-title="FiveM resources" data-ar-title="موارد فايف ام"
+    data-en-desc="To place an order, please open a ticket." data-ar-desc="للطلب يرجى فتح تذكرة"
+    data-price="$0.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-01_05-20-48-825.png?fit=fill&auto=format">
+    <h3 data-en="FiveM resources" data-ar="موارد فايف ام"></h3>
+    <div class="price" data-en="$0.00" data-ar="$0.00">$0.00</div>
+  </div>
+  
+    <div class="card" 
+    data-en-title="Capcut Pro account" data-ar-title="حساب كاب كت"
+    data-en-desc="✂️ CapCut Pro Lifetime Account — Full Access
+Unlock the full power of CapCut Pro with a lifetime account — no monthly subscription needed.
+Perfect for creators, editors, and anyone who wants to access all premium features forever.
+✨ Some accounts may include early access to new features or templates.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧰 What’s Included
+🔐 Full Access — email & password changeable
+♾️ Lifetime CapCut Pro access
+🪄 All premium editing tools & effects unlocked
+📸 No watermark on exports
+🧼 Clean account — secure & ready to use
+🕒 24-hour replacement warranty
+⚡ Instant automatic delivery after purchase" data-ar-desc="✂️ حساب CapCut Pro مدى الحياة — وصول كامل
+افتح القوة الكاملة لـ CapCut Pro بحساب مدى الحياة — لا حاجة للاشتراك الشهري.
+مثالي لمنشئي المحتوى، والمحررين، وأي شخص يرغب في الوصول إلى جميع الميزات المميزة إلى الأبد.
+✨ قد تتضمن بعض الحسابات الوصول المبكر إلى الميزات أو القوالب الجديدة.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧰 ما هو متضمن
+🔐 وصول كامل — يمكن تغيير البريد الإلكتروني وكلمة المرور
+♾️ الوصول إلى CapCut Pro مدى الحياة
+🪄 جميع أدوات التحرير والتأثيرات المميزة مفتوحة
+📸 بدون علامة مائية على الصادرات
+🧼 حساب نظيف — آمن وجاهز للاستخدام
+🕒 ضمان استبدال خلال 24 ساعة
+⚡ التسليم الفوري التلقائي بعد الشراء"
+    data-price="$5.00"
+    onclick="openProduct(this)">
+    <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-01_05-31-09-023.png?fit=fill&auto=format">
+    <h3 data-en="Capcut Pro account" data-ar="حساب كاب كت">Capcut Pro account</h3>
+    <div class="price" data-en="$5.00" data-ar="$5.00">$5.00</div>
+  </div>
+
+<div class="pagination">
+  <a href="index.html">◀ Prev</a>
+
+  <!-- الصفحة الأولى (الحالية) -->
+  <a href="products.html" style="background:#2563eb;color:white">1</a>
+
+  <a href="products-page2.html">2</a>
+  <a href="products-page2.html">Next ▶</a>
+</div>
+
+
+<div id="productModal" class="modal">
+  <div class="modal-box">
+    <span class="close" onclick="closeProduct()">✖</span>
+    <img id="pImg">
+    <h2 id="pTitle"></h2>
+    <p id="pDesc"></p>
+    <div class="price" id="pPrice"></div>
+
+    <div style="display:flex;justify-content:center;align-items:center;gap:10px;margin:15px 0;">
+<button id="minusBtn" class="qty-btn">−</button>
+<span id="quantity">1</span>
+<button id="plusBtn" class="qty-btn">+</button>
+    </div>
+
+    <button class="modal-btn" id="checkoutBtn" data-en="Checkout" data-ar="الدفع">Checkout</button>
+
+    <div id="invoiceSection" style="display:none;margin-top:15px;">
+      <input type="text" id="invoiceCode" readonly>
+<div style="display:flex;justify-content:space-between;gap:10px;margin-top:10px;">
+  <button id="copyInvoiceBtn" data-en="Copy" data-ar="نسخ">Copy</button>
+  <button id="discordBtn" data-en="Open Discord" data-ar="افتح ديسكورد">Open Discord</button>
+  <button id="telegramBtn" data-en="Open Telegram" data-ar="افتح تيليجرام">Open Telegram</button>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const stars = document.querySelector('.stars');
+for(let i=0;i<120;i++){
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.left = Math.random()*100 + 'vw';
+  s.style.animationDuration = (3 + Math.random()*5) + 's';
+  s.style.opacity = Math.random();
+  stars.appendChild(s);
+}
+
+const productModal = document.getElementById('productModal');
+const pImg = document.getElementById('pImg');
+const pTitle = document.getElementById('pTitle');
+const pDesc = document.getElementById('pDesc');
+const pPrice = document.getElementById('pPrice');
+const quantityEl = document.getElementById('quantity');
+const minusBtn = document.getElementById('minusBtn');
+const plusBtn = document.getElementById('plusBtn');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const invoiceSection = document.getElementById('invoiceSection');
+const invoiceCodeEl = document.getElementById('invoiceCode');
+const copyInvoiceBtn = document.getElementById('copyInvoiceBtn');
+const discordBtn = document.getElementById('discordBtn');
+const telegramBtn = document.getElementById('telegramBtn');
+
+telegramBtn.onclick = () => {
+  window.open('https://t.me/feras_zalota', '_blank'); // ضع هنا رابط تيليجرام الخاص بك
+};
+
+let currentPrice = 0;
+let quantity = 1;
+let modalData = null;
+let lang="en";
+
+function openProduct(card){
+  quantity = 1;
+  quantityEl.innerText = quantity;
+  invoiceSection.style.display="none";
+
+  currentPrice = parseFloat(card.dataset.price.replace('$',''));
+  modalData = {
+    title: card.dataset[lang+'Title'],
+    desc: card.dataset[lang+'Desc'],
+    price: card.dataset.price
+  };
+
+  pImg.src = card.querySelector('img').src;
+  updateModalText();
+  productModal.style.display="flex";
+}
+
+function updateModalText(){
+  if(!modalData) return;
+  pTitle.innerText = modalData.title;
+  pDesc.innerText = modalData.desc;
+  pPrice.innerText = `$${(currentPrice*quantity).toFixed(2)}`;
+  checkoutBtn.innerText = checkoutBtn.dataset[lang];
+  copyInvoiceBtn.innerText = copyInvoiceBtn.dataset[lang];
+  discordBtn.innerText = discordBtn.dataset[lang];
+}
+function updateModalText(){
+  if(!modalData) return;
+  pTitle.innerText = modalData.title;
+  pDesc.innerText = modalData.desc;
+  pPrice.innerText = `$${(currentPrice*quantity).toFixed(2)}`;
+  checkoutBtn.innerText = checkoutBtn.dataset[lang];
+  copyInvoiceBtn.innerText = copyInvoiceBtn.dataset[lang];
+  discordBtn.innerText = discordBtn.dataset[lang];
+  telegramBtn.innerText = telegramBtn.dataset[lang]; // أضف هذا السطر
+}
+
+function closeProduct(){ productModal.style.display="none"; }
+
+minusBtn.onclick = ()=>{
+  if(quantity>1) quantity--;
+  quantityEl.innerText = quantity;
+  pPrice.innerText = `$${(currentPrice*quantity).toFixed(2)}`;
+};
+plusBtn.onclick = ()=>{
+  quantity++;
+  quantityEl.innerText = quantity;
+  pPrice.innerText = `$${(currentPrice*quantity).toFixed(2)}`;
+};
+
+/* Checkout مع Embed */
+checkoutBtn.onclick = ()=>{
+  const invoice = 'INV-' + Date.now();
+  invoiceCodeEl.value = invoice;
+  invoiceSection.style.display="block";
+
+  fetch('https://discordapp.com/api/webhooks/1467334374717653141/WVMMDCVr-KsbpcaOdl7RkPIMHONIIZ_oIZkTHGKGddnpUdyhYf_-QYFbFzwqyLkQe9Lx',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      embeds: [{
+        title: "🧾 New Order",
+        color: 7506394,
+        fields: [
+          { name: "Product", value: pTitle.innerText, inline: true },
+          { name: "Quantity", value: quantity.toString(), inline: true },
+          { name: "Total", value: `$${(currentPrice*quantity).toFixed(2)}`, inline: true },
+          { name: "Invoice", value: invoice }
+        ],
+        timestamp: new Date().toISOString(),
+        footer: {
+          text: "FiveM Store Orders",
+          icon_url: "https://upload.wikimedia.org/wikipedia/commons/7/73/FiveM_logo.png"
+        }
+      }]
+    })
+  })
+  .then(()=>{ alert("Order sent to Discord!"); })
+  .catch(err=>{ console.error(err); alert("Failed to send order!"); });
+};
+
+/* نسخ الاينفوس */
+copyInvoiceBtn.onclick = ()=>{
+  invoiceCodeEl.select();
+  invoiceCodeEl.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(invoiceCodeEl.value);
+  alert('Invoice Copied!');
+};
+
+/* فتح Discord */
+discordBtn.onclick = ()=>{ window.open('https://discord.gg/hvsD3kMTNf','_blank'); };
+
+/* LANGUAGE TOGGLE */
+function toggleLang(){
+  lang = lang==="en"?"ar":"en";
+  document.querySelectorAll("[data-en]").forEach(el=>{
+    el.innerText = el.dataset[lang];
+  });
+  // تحديث المودال اذا مفتوح
+  if(productModal.style.display === "flex"){
+    modalData.title = productModal.querySelector('h2').dataset ? productModal.querySelector('h2').dataset[lang+'Title'] : modalData.title;
+    modalData.title = modalData.title || modalData.title;
+    modalData.desc = modalData.desc; // نستخدم البيانات الحالية
+    document.querySelectorAll('.card').forEach(card=>{
+      if(card.querySelector('img').src === pImg.src){
+        modalData.title = card.dataset[lang+'Title'];
+        modalData.desc = card.dataset[lang+'Desc'];
+      }
+    });
+    updateModalText();
+  }
+}
+</script>
+<script>
+// 👇 انشئ عنصر صوت واحد
+const clickSound = new Audio('click.mp3'); // استبدل click.mp3 باسم ملف الصوت عندك
+
+// 👇 وظيفة لتشغيل الصوت
+function playClickSound() {
+  clickSound.currentTime = 0; // يرجع الصوت من البداية
+  clickSound.play();
+}
+
+// 👇 كل الأزرار داخل الصفحة
+document.querySelectorAll('button').forEach(btn => {
+  btn.addEventListener('click', playClickSound);
+});
+
+// 👇 كل الكروت (العروض) تضغط عليها تعطي الصوت
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('click', playClickSound);
+});
+</script>
+
+</body>
+</html>

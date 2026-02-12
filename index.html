@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FiveM Store</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  /* ELECTRIC BORDER FOR HERO TITLE */
+.hero-store{
+  position:relative;
+  display:inline-block;
+  padding:18px 40px;
+  border-radius:18px;
+  margin-bottom:25px; /* 👈 هذا السطر مهم */
+}
+
+/* الإطار الكهربائي */
+.hero-store::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  border:2px solid #7c3aed;
+
+  box-shadow:
+    0 0 6px #7c3aed,
+    0 0 14px #3b82f6,
+    0 0 30px rgba(124,58,237,.9);
+
+  animation:electricPulse 1.5s infinite;
+  pointer-events:none;
+}
+
+/* حركة التشغيل والإطفاء (كهرباء) */
+@keyframes electricPulse{
+  0%{
+    opacity:.15;
+    box-shadow:0 0 4px #3b82f6;
+  }
+  20%{
+    opacity:1;
+    box-shadow:
+      0 0 10px #7c3aed,
+      0 0 22px #3b82f6;
+  }
+  40%{
+    opacity:.3;
+  }
+  60%{
+    opacity:1;
+    box-shadow:
+      0 0 14px #7c3aed,
+      0 0 38px rgba(59,130,246,.9);
+  }
+  100%{
+    opacity:.2;
+    box-shadow:0 0 6px #3b82f6;
+  }
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  color:#fff;
+  overflow-x:hidden;
+  background:
+    linear-gradient(rgba(2,6,23,0.88),rgba(2,6,23,0.95)),
+    url("https://static1.cbrimages.com/wordpress/wp-content/uploads/2024/06/call-of-duty-mw3.jpg");
+  background-size:cover;
+  background-position:center;
+  background-attachment:fixed;
+}
+canvas{position:fixed;inset:0;z-index:0}
+
+/* NAVBAR */
+.navbar{
+  position:relative;z-index:2;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:18px 50px;
+}
+.logo{
+  font-size:22px;font-weight:bold;
+  background:linear-gradient(90deg,#0042ad,#7c3aed);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-links a,.nav-right a{
+  color:#c7d2fe;text-decoration:none;
+  padding:14px 24px;border-radius:15px;
+  margin:0 5px;font-size:17px;
+}
+.nav-links a:hover,.nav-right a:hover{
+  background:linear-gradient(90deg,#7c3aed,#0045b4);
+  color:#fff;
+}
+.client{background:#2563eb;color:white}
+
+/* HERO */
+.hero{
+  position:relative;z-index:2;
+  min-height:80vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:40px 20px;
+}
+.badge{
+  border:1px solid #1e3a8a;
+  padding:8px 16px;
+  border-radius:999px;
+  color:#93c5fd;
+  margin-bottom:25px;
+}
+.hero-store{
+  font-size:75px;
+  font-weight:900;
+  background:linear-gradient(90deg,#003d9e,#7c3aed);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.hero p{color:#94a3b8;max-width:650px;margin-bottom:35px}
+.btn{
+  background:#2563eb;
+  color:white;
+  padding:14px 28px;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+/* PRODUCTS */
+.section{position:relative;z-index:2;padding:80px 60px}
+.section h2{text-align:center}
+.section p{text-align:center;color:#94a3b8;margin-bottom:40px}
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+}
+.card{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:16px;
+  padding:15px;
+  cursor:pointer;
+  transition:.3s;
+  max-width:260px;
+  margin:auto;
+}
+
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 0 35px rgba(124,58,237,.4);
+}
+.card img{width:100%;border-radius:12px;margin-bottom:15px}
+.price{color:#3b82f6;font-weight:bold;margin-top:10px}
+
+/* MODAL */
+.modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+}
+.modal-box{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:18px;
+  padding:25px;
+  width:90%;
+  max-width:480px;
+  text-align:center;
+  position:relative;
+}
+.modal-box img{width:100%;border-radius:12px;margin-bottom:15px}
+.modal-box p{color:#94a3b8;margin:10px 0}
+.close{
+  position:absolute;
+  top:15px;
+  right:20px;
+  cursor:pointer;
+}
+/* تعديل زر Checkout مباشرة باستخدام الكلاس والـ id */
+#checkoutBtn.modal-btn {
+  background: linear-gradient(90deg, #7c3aed, #3b82f6); /* أرجواني + أزرق كهربائي */
+  padding: 16px 32px;       /* حجم أكبر */
+  font-size: 18px;           /* تكبير الخط */
+  font-weight: 900;          /* خط أقوى */
+  border-radius: 14px;       /* حواف أكثر استدارة */
+  color: white;              /* لون النص */
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(124,58,237,0.6); /* تأثير ثلاثي الأبعاد */
+  transition: 0.3s;
+}
+#checkoutBtn.modal-btn:hover {
+  transform: scale(1.05);   /* تكبير بسيط عند المرور */
+  box-shadow: 0 6px 20px rgba(124,58,237,0.8);
+}
+
+
+/* FOOTER */
+footer{text-align:center;padding:30px;color:#64748b;z-index:2;position:relative}
+/* ===== MOBILE NAVBAR FIX (FINAL) ===== */
+@media (max-width: 768px){
+
+  .navbar{
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 20px;
+    gap: 15px;
+  }
+
+  .logo{
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .nav-links{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .nav-links a{
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .nav-right{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .nav-right a{
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="navbar">
+  <div class="logo">FiveM Store</div>
+  <div class="nav-links">
+    <a href="#" data-en="🏠 Home" data-ar="🏠 الرئيسية">🏠 Home</a>
+    <a href="products.html" data-en="📦 Products" data-ar="📦 المنتجات">📦 Products</a>
+    <a href="https://discord.gg/hvsD3kMTNf" target="_blank" data-en="🛠 Support" data-ar="🛠 الدعم">🛠 Support</a>
+    <a href="products-page3.html" data-en="⚠️ warning" data-ar="⚠️ مهم جدا">⚠️ warning</a>
+  </div>
+  <div class="nav-right">
+    <a href="#" onclick="toggleLang()">🌐 AR / EN</a>
+    <a href="https://t.me/feras_zalota" target="_blank" data-en="Client Area" data-ar="منطقة العميل">Client Area</a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="badge" data-en="Instant Delivery • Secure • 24/7 Support" data-ar="توصيل فوري • آمن • دعم 24/7">Instant Delivery • Secure • 24/7 Support</div>
+  <span class="hero-store">FiveM Store</span>
+  <p data-en="All products available: FiveM / Netflix / ChatGPT / all games account" data-ar="متوفر جميع المنتجات: فايف ام / نيتفلكس / ذكاء اصطناعي / حسابات لجميع الالعاب">Professional FiveM scripts and services</p>
+  <a class="btn" href="products.html" data-en="View Products" data-ar="عرض المنتجات">View Products</a>
+</div>
+
+<div class="section">
+  <h2 data-en="Best Seller Products" data-ar="أفضل المنتجات مبيعاً">Best Seller Products</h2>
+  <p data-en="Products that customers love" data-ar="المنتجات التي يحبها العملاء">Products that customers love</p>
+
+  <div class="products">
+
+    <div class="card" onclick="openModal(
+      'https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_00-23-46-677.png?fit=fill&auto=format',
+      'Minecraft Account',
+      '',
+      '$7.00'
+    )">
+      <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_00-23-46-677.png?fit=fill&auto=format">
+      <h3>Minecraft Account</h3>
+      <div class="price">$7.00</div>
+    </div>
+
+    <div class="card" onclick="openModal(
+      'https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_03-55-20-404.png?fit=fill&auto=format',
+      'Rockstar Activation Codes',
+      '',
+      '$0.50'
+    )">
+      <img src="https://697ec1e6c4feaabd2d126b36.imgix.net/Picsart_26-02-02_03-55-20-404.png?fit=fill&auto=format">
+      <h3>Rockstar Activation Codes</h3>
+      <div class="price">$0.50</div>
+    </div>
+    
+  </div>
+</div>
+
+<footer>
+  <!-- Owner info -->
+  <div style="margin-bottom:8px;font-weight:bold; text-align:center; font-size:18px;">
+    <span data-en="Owner Shop: " data-ar="مالك المتجر: ">Owner Shop: </span>
+    <span class="animated-name" data-en="Feras" data-ar="فراس">Feras</span>
+  </div>
+  <!-- الحقوق -->
+  <div style="text-align:center; font-size:14px;">© 2026 FiveM Store</div>
+</footer>
+
+<style>
+/* ====== اللون المتحرك لاسم Owner ====== */
+.animated-name{
+  background: linear-gradient(90deg, #5f008b, #5f008b, #001488, #001488);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientMove 3s linear infinite;
+  font-weight:bold;
+}
+
+@keyframes gradientMove{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+</style>
+
+
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <span class="close" onclick="closeModal()">✖</span>
+    <img id="mImg">
+    <p id="mDesc"></p>
+    <div class="price" id="mPrice"></div>
+    <button class="modal-btn" onclick="addToCart()">Add to Cart</button>
+  </div>
+</div>
+
+<script>
+/* MODAL */
+const modal=document.getElementById("modal"),
+      mImg=document.getElementById("mImg"),
+      mTitle=document.getElementById("mTitle"),
+      mDesc=document.getElementById("mDesc"),
+      mPrice=document.getElementById("mPrice");
+
+function openModal(img,title,desc,price){
+  mImg.src=img;
+  mTitle.innerText=title;
+  mDesc.innerText=desc;
+  mPrice.innerText=price;
+  modal.style.display="flex";
+}
+function closeModal(){modal.style.display="none"}
+
+/* CART */
+function addToCart(){
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart.push({
+    title: mTitle.innerText,
+    price: mPrice.innerText,
+    img: mImg.src
+  });
+  localStorage.setItem("cart", JSON.stringify(cart));
+  alert("Added to cart ✔");
+  closeModal();
+}
+
+/* LANGUAGE */
+let lang="en";
+function toggleLang(){
+  lang=lang==="en"?"ar":"en";
+  document.querySelectorAll("[data-en]").forEach(el=>{
+    el.innerText=el.dataset[lang];
+  });
+}
+
+/* STARS */
+const canvas=document.getElementById("stars"),ctx=canvas.getContext("2d");
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+resize();onresize=resize;
+let stars=[];
+for(let i=0;i<180;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5,s:Math.random()*.6+.2});
+(function anim(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="white";
+  stars.forEach(s=>{
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fill();
+    s.y+=s.s;
+    if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width}
+  });
+  requestAnimationFrame(anim);
+})();
+</script>
+<script>
+// 👇 انشئ عنصر صوت واحد
+const clickSound = new Audio('click.mp3'); // استبدل click.mp3 باسم ملف الصوت عندك
+
+// 👇 وظيفة لتشغيل الصوت
+function playClickSound() {
+  clickSound.currentTime = 0; // يرجع الصوت من البداية
+  clickSound.play();
+}
+
+// 👇 كل الأزرار داخل الصفحة
+document.querySelectorAll('button').forEach(btn => {
+  btn.addEventListener('click', playClickSound);
+});
+
+// 👇 كل الكروت (العروض) تضغط عليها تعطي الصوت
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('click', playClickSound);
+});
+</script>
+
+</body>
+</html>

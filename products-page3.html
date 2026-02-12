@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FiveM Store</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ========= Base Styles ========= */
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  color:#fff;
+  overflow-x:hidden;
+  background:
+    linear-gradient(rgba(2,6,23,0.88),rgba(2,6,23,0.95)),
+    url("https://image.api.playstation.com/vulcan/ap/rnd/202308/1511/71c2d79edcd347b3e863a11b426c17255c0391a11ae3e50c.jpg");
+  background-size:cover;
+  background-position:center;
+  background-attachment:fixed;
+}
+canvas{position:fixed;inset:0;z-index:0}
+
+/* Navbar */
+.navbar{
+  position:relative;z-index:2;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:18px 50px;
+}
+.logo{
+  font-size:22px;font-weight:bold;
+  background:linear-gradient(90deg,#0042ad,#7c3aed);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-links a,.nav-right a{
+  color:#c7d2fe;text-decoration:none;
+  padding:14px 24px;border-radius:15px;
+  margin:0 5px;font-size:17px;
+}
+.nav-links a:hover,.nav-right a:hover{
+  background:linear-gradient(90deg,#7c3aed,#0045b4);
+  color:#fff;
+}
+.client{background:#2563eb;color:white}
+.lang-btn{
+  background:linear-gradient(90deg,#7c3aed,#3b82f6);
+  border:none;
+  padding:8px 16px;
+  border-radius:10px;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  margin-left:10px;
+}
+
+/* Hero / Header */
+.header{
+  text-align:center;
+  padding:50px 20px;
+  position:relative; z-index:2;
+}
+.header h1{
+  font-size:48px;
+  font-weight:900;
+  background:linear-gradient(90deg,#003d9e,#7c3aed);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.header p{color:#94a3b8;margin-top:10px}
+
+/* Cards Section */
+.cards-section{
+  position:relative; z-index:2;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:25px;
+  padding:60px;
+}
+.card{
+  background:#020617;
+  border:2px solid #1e293b;
+  border-radius:18px;
+  padding:25px;
+  text-align:center;
+  cursor:pointer;
+  transition:.3s;
+  position:relative;
+  overflow:hidden;
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 0 35px rgba(124,58,237,.4);
+}
+.card h3{
+  font-size:20px;
+  font-weight:900;
+  margin-bottom:10px;
+  background:linear-gradient(90deg,#003d9e,#7c3aed);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.card p{
+  color:#94a3b8;
+  margin-bottom:15px;
+}
+
+/* Electric Border for Cards */
+.card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  border:2px solid #7c3aed;
+  box-shadow:
+    0 0 6px #7c3aed,
+    0 0 14px #3b82f6,
+    0 0 30px rgba(124,58,237,.9);
+  animation:electricPulse 1.5s infinite;
+  pointer-events:none;
+}
+@keyframes electricPulse{
+  0%{opacity:.15;box-shadow:0 0 4px #3b82f6;}
+  20%{opacity:1;box-shadow:0 0 10px #7c3aed,0 0 22px #3b82f6;}
+  40%{opacity:.3;}
+  60%{opacity:1;box-shadow:0 0 14px #7c3aed,0 0 38px rgba(59,130,246,.9);}
+  100%{opacity:.2;box-shadow:0 0 6px #3b82f6;}
+}
+
+/* Footer */
+footer{text-align:center;padding:30px;color:#64748b;z-index:2;position:relative}
+
+/* Modal */
+.modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.8);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+.modal-box{
+  background:#020617;
+  border:2px solid #1e293b;
+  border-radius:18px;
+  padding:30px;
+  width:90%;
+  max-width:480px;
+  text-align:center;
+  position:relative;
+}
+.modal-box h2{
+  font-size:24px;
+  margin-bottom:15px;
+  background:linear-gradient(90deg,#003d9e,#7c3aed);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.modal-box p{color:#94a3b8;margin-bottom:20px}
+.close{
+  position:absolute;top:15px;right:20px;
+  cursor:pointer;
+}
+.modal-btn{
+  background:linear-gradient(90deg,#7c3aed,#3b82f6);
+  border:none;
+  padding:12px 24px;
+  border-radius:10px;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* Stars */
+.stars{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.star{position:absolute;top:-10px;width:2px;height:2px;background:white;opacity:.8;animation:fall linear infinite;}
+@keyframes fall{to{transform:translateY(110vh);}}
+</style>
+</head>
+
+<body>
+
+<canvas class="stars"></canvas>
+
+<div class="navbar">
+  <div class="logo">FiveM Store</div>
+  <div class="nav-links">
+    <a href="index.html" data-en="🏠 Home" data-ar="🏠 الرئيسية">🏠 Home</a>
+    <a href="https://discord.gg/hvsD3kMTNf" target="_blank" data-en="🛠 Support" data-ar="🛠 الدعم">🛠 Support</a>
+  </div>
+  <div class="nav-right">
+    <a href="https://t.me/feras_zalota" target="_blank" data-en="Client Area" data-ar="منطقة العميل">Client Area</a>
+    <button class="lang-btn" onclick="toggleLang()">🌐 AR / EN</button>
+  </div>
+</div>
+
+<div class="header">
+  <h1 data-en="Information" data-ar="معلومات">Information</h1>
+  <p data-en="Quick access to store and info" data-ar="الوصول السريع ومعلومات المتجر">Quick access to store tools and info</p>
+</div>
+
+<div class="cards-section">
+  <div class="card" onclick="openModalCard('rules')">
+    <h3 data-en="📜 Rules" data-ar="📜 قوانين الاسترجاع">📜 Return policies</h3>
+    <p data-en="1. If you purchase a product that does not work, you are entitled to a full refund within the specified period. 📍
+
+3. In case of returning any item, the invoice must be included. 📍" data-ar="1. إذا اشتريت منتجًا لا يعمل، يحق لك استرداد المبلغ كاملاً خلال الفترة المحددة. 📍
+
+2.  في حالة استرجاع اي غرض  يلزم كتابة الفاتورة 📍">1. If you purchase a product that does not work, you are entitled to a full refund within the specified period. 📍
+
+2. Please read the description of each offer carefully. 📍
+
+3. In case of returning any item, the invoice must be included. 📍</p>
+  </div>
+
+  <div class="card" onclick="openModalCard('support')">
+    <h3 data-en="How to buy 💲" data-ar="طريقة الشراء 💲">How to buy 💲</h3>
+    <p data-en="1. Go to the products page
+2. Select the product
+3. Specify the quantity you need
+4. Click on Pay
+5. Copy the invoice
+6. Choose the payment method and send the invoice via Discord or Telegram and wait for a response
+Note...📝
+Only write the order number" data-ar="1. الدخول الى صفحة المنتجات 
+2. اختيار المنتج
+3 . حدد الكمية التي تحتاجها
+4 . اضغط على الدفع
+5 . قم بنسخ الفاتورة 
+6 . اختار مكان الدفع و قم بأرسال الفاتورة عن طريق ديسكورد او تيليجرام  وانتظر الرد 
+ملاحظة...📝
+قم بكتابة رقم الطلب فقط ">1. Go to the products page
+2. Select the product
+3. Specify the quantity you need
+4. Click on Pay
+5. Copy the invoice
+6. Choose the payment method and send the invoice via Discord or Telegram and wait for a response
+Note...📝
+Only write the order number</p>
+  </div>
+
+  <div class="card" onclick="openModalCard('discord')">
+    <h3 data-en="💬 support" data-ar="💬 الدعم الفني">💬 support</h3>
+    <p data-en="To contact technical support:
+Telegram: feras_zalota
+Discord: https://discord.gg/d7GuYuHGJB" data-ar="للتواصل مع الدعم الفني 
+Telegram: feras_zalota
+Tiscord: https://discord.gg/d7GuYuHGJB ">To contact technical support:
+Telegram: feras_zalota
+Discord: https://discord.gg/d7GuYuHGJB</p>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="infoModal" class="modal">
+  <div class="modal-box">
+    <span class="close" onclick="closeModal()">✖</span>
+    <h2 id="modalTitle"></h2>
+    <p id="modalDesc"></p>
+    <button class="modal-btn" onclick="closeModal()" data-en="Close" data-ar="إغلاق">Close</button>
+  </div>
+</div>
+
+<script>
+/* Stars Animation */
+const canvas = document.querySelector('.stars');
+const ctx = canvas.getContext('2d');
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+resize();onresize=resize;
+let stars=[];
+for(let i=0;i<150;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5,s:Math.random()*.6+.2});
+(function anim(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="white";
+  stars.forEach(s=>{
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fill();
+    s.y+=s.s;
+    if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width;}
+  });
+  requestAnimationFrame(anim);
+})();
+
+/* Modal Functionality */
+const infoModal = document.getElementById('infoModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalDesc = document.getElementById('modalDesc');
+
+// محتوى المودال بالعربية والانجليزية
+const modalTexts = {
+  rules: { en: "Welcome to our store rules! Follow them carefully.", ar: "مرحبًا بك في قوانين المتجر! يرجى اتباعها بعناية." },
+  support: { en: "Need help? Contact our support team.", ar: "تحتاج مساعدة؟ تواصل مع فريق الدعم الفني." },
+  discord: { en: "Join our Discord community.", ar: "انضم إلى مجتمع ديسكورد الخاص بنا." }
+};
+
+function openModalCard(key){
+  modalTitle.innerText = document.querySelector(`.card[onclick*="${key}"] h3`).innerText;
+  modalDesc.innerText = modalTexts[key][lang];
+  infoModal.style.display = 'flex';
+}
+function closeModal(){ infoModal.style.display = 'none'; }
+
+/* Language Toggle */
+let lang="en";
+function toggleLang(){
+  lang=lang==="en"?"ar":"en";
+  document.querySelectorAll("[data-en]").forEach(el=>{
+    el.innerText=el.dataset[lang];
+  });
+
+  // إذا كان المودال مفتوح
+  if(infoModal.style.display==='flex'){
+    for(const key in modalTexts){
+      if(modalDesc.innerText===modalTexts[key][lang==="en"?"ar":"en"]){
+        modalDesc.innerText = modalTexts[key][lang];
+      }
+    }
+  }
+}
+</script>
+<script>
+// 👇 انشئ عنصر صوت واحد
+const clickSound = new Audio('click.mp3'); // استبدل click.mp3 باسم ملف الصوت عندك
+
+// 👇 وظيفة لتشغيل الصوت
+function playClickSound() {
+  clickSound.currentTime = 0; // يرجع الصوت من البداية
+  clickSound.play();
+}
+
+// 👇 كل الأزرار داخل الصفحة
+document.querySelectorAll('button').forEach(btn => {
+  btn.addEventListener('click', playClickSound);
+});
+
+// 👇 كل الكروت (العروض) تضغط عليها تعطي الصوت
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('click', playClickSound);
+});
+</script>
+
+<footer>© 2026 FiveM Store</footer>
+
+</body>
+</html>
